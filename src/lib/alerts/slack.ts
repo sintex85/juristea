@@ -1,6 +1,8 @@
+type SlackBlock = Record<string, unknown>
+
 interface SlackMessage {
   text: string
-  blocks?: any[]
+  blocks?: SlackBlock[]
 }
 
 export async function sendSlackWebhook(

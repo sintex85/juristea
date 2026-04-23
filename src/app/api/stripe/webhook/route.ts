@@ -4,6 +4,11 @@ import { db } from "@/lib/db"
 import { users, subscriptions } from "@/lib/db/schema"
 import type Stripe from "stripe"
 
+type SubscriptionPeriod = {
+  current_period_start: number
+  current_period_end: number
+}
+
 export async function POST(request: Request) {
   const body = await request.text()
   const signature = request.headers.get("stripe-signature")!
@@ -32,8 +37,8 @@ export async function POST(request: Request) {
         stripeSubscriptionId: subscriptionId,
         stripePriceId: sub.items.data[0].price.id,
         status: "active",
-        currentPeriodStart: new Date((sub as any).current_period_start * 1000),
-        currentPeriodEnd: new Date((sub as any).current_period_end * 1000),
+        currentPeriodStart: new Date((sub as unknown as SubscriptionPeriod).current_period_start * 1000),
+        currentPeriodEnd: new Date((sub as unknown as SubscriptionPeriod).current_period_end * 1000),
       })
 
       await db
@@ -52,8 +57,8 @@ export async function POST(request: Request) {
         .set({
           status,
           cancelAtPeriodEnd: sub.cancel_at_period_end,
-          currentPeriodStart: new Date((sub as any).current_period_start * 1000),
-          currentPeriodEnd: new Date((sub as any).current_period_end * 1000),
+          currentPeriodStart: new Date((sub as unknown as SubscriptionPeriod).current_period_start * 1000),
+          currentPeriodEnd: new Date((sub as unknown as SubscriptionPeriod).current_period_end * 1000),
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.stripeSubscriptionId, sub.id))
@@ -80,7 +85,7 @@ export async function POST(request: Request) {
 
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice
-      const subscriptionId = (invoice as any).subscription as string
+      const subscriptionId = (invoice as unknown as { subscription: string }).subscription
       if (subscriptionId) {
         await db
           .update(subscriptions)
