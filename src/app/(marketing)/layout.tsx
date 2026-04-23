@@ -2,14 +2,17 @@
 
 import Link from "next/link"
 import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 import { Sun, Moon } from "lucide-react"
 import { Logo } from "@/components/logo"
 
+const subscribe = () => () => {}
+
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  // next-themes cannot resolve the theme during SSR; render a placeholder
+  // until hydration to avoid a mismatch.
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false)
   if (!mounted) return <div className="h-8 w-8" />
   return (
     <button

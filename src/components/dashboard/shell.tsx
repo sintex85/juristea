@@ -1,13 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { signOut } from "next-auth/react"
 import { Menu, X } from "lucide-react"
 import { Sidebar, navItems } from "./sidebar"
-import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/logo"
 import {
   DropdownMenu,
@@ -27,11 +25,13 @@ export function DashboardShell({
   children: React.ReactNode
 }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [lastPathname, setLastPathname] = useState<string | null>(null)
   const pathname = usePathname()
 
-  useEffect(() => {
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname)
     setMobileOpen(false)
-  }, [pathname])
+  }
 
   const initials = user.name
     ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
