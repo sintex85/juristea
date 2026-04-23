@@ -1,8 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { deadlines, cases } from "@/lib/db/schema"
-import { eq, and, desc, asc } from "drizzle-orm"
-import Link from "next/link"
+import { eq, asc } from "drizzle-orm"
 
 export default async function DeadlinesPage() {
   const session = await auth()

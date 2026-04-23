@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { cases, clients } from "@/lib/db/schema"
-import { eq, desc, and, sql } from "drizzle-orm"
+import { eq, desc, sql } from "drizzle-orm"
 import { z } from "zod"
 import { PLANS } from "@/lib/stripe/plans"
 

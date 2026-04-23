@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { timeEntries, cases } from "@/lib/db/schema"
-import { eq, desc, sql } from "drizzle-orm"
+import { eq, desc } from "drizzle-orm"
 
 export default async function TimePage() {
   const session = await auth()

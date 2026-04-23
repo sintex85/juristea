@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { deadlines, activityLogs } from "@/lib/db/schema"
-import { eq, and, lt, lte, gte } from "drizzle-orm"
+import { eq, and, lt } from "drizzle-orm"
 
 export const maxDuration = 60
 

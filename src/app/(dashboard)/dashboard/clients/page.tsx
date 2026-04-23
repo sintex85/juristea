@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { clients, cases } from "@/lib/db/schema"
+import { clients } from "@/lib/db/schema"
 import { eq, desc, sql } from "drizzle-orm"
 import Link from "next/link"
 

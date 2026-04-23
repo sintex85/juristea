@@ -54,8 +54,7 @@ export async function POST(req: Request) {
         for (const pdfName of pdfFiles) {
           const notification = await createNotificationFromPdf(
             session.user.id,
-            pdfName,
-            file.name
+            pdfName
           )
           results.push(notification)
         }
@@ -195,8 +194,7 @@ export async function POST(req: Request) {
 
 async function createNotificationFromPdf(
   userId: string,
-  pdfName: string,
-  zipName: string
+  pdfName: string
 ) {
   const type = detectNotificationType(pdfName)
   const [notification] = await db

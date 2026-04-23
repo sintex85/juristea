@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { cases, deadlines, lexnetNotifications, users } from "@/lib/db/schema"
-import { eq, and, desc, gte, lte, sql } from "drizzle-orm"
+import { eq, and, gte, lte, sql } from "drizzle-orm"
 import Link from "next/link"
 
 export default async function DashboardPage() {

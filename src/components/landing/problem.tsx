@@ -1,4 +1,4 @@
-function TimelineBlock({ label, bad, good, children }: { label: string; bad?: boolean; good?: boolean; children: React.ReactNode }) {
+function TimelineBlock({ label, bad, children }: { label: string; bad?: boolean; good?: boolean; children: React.ReactNode }) {
   return (
     <div className={`rounded-xl border p-6 ${bad ? "border-red-500/20 bg-red-500/5" : "border-emerald-500/20 bg-emerald-500/5"}`}>
       <p className={`text-xs font-bold uppercase tracking-widest mb-4 ${bad ? "text-red-400" : "text-emerald-400"}`}>
