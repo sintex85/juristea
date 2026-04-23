@@ -1,35 +1,53 @@
-const testimonials = [
+const items = [
   {
-    name: "Elena Martínez",
-    role: "Abogada laboralista, Madrid",
-    quote: "Antes perdía media hora al día peleándome con LexNET. Ahora subo el ZIP y Juristea hace el resto. Los plazos se calculan solos y las alertas me dan tranquilidad.",
+    quote:
+      "Pasé de perder 40 minutos diarios clasificando Lexnet a literalmente",
+    quoteEm: "cero",
+    quoteTail: ". Es una diferencia que se nota en la cuenta de resultados.",
+    attribution: "MARÍA GONZÁLEZ · SOCIA · GONZÁLEZ & ASOCIADOS · MADRID",
   },
   {
-    name: "Carlos Ruiz",
-    role: "Socio fundador, Ruiz & Asociados, Barcelona",
-    quote: "La gestión de expedientes por fin tiene sentido. Mis 4 abogados usan Juristea cada día. El control de tiempo nos ha ayudado a facturar un 20% más.",
+    quote:
+      "Por fin un software legal que no parece sacado de un museo. Mi equipo lo adoptó en",
+    quoteEm: "dos días",
+    quoteTail: ".",
+    attribution: "JAVIER FERNÁNDEZ · PENALISTA · BARCELONA",
+  },
+  {
+    quote: "La tranquilidad con los plazos",
+    quoteEm: "no tiene precio",
+    quoteTail: ". Juristea te cubre las espaldas.",
+    attribution: "CARMEN ORTEGA · LETRADA · VALENCIA",
   },
 ]
 
 export function Testimonials() {
   return (
-    <section className="bg-[#0C0A09] py-20">
-      <div className="container">
-        <h2 className="text-2xl font-extrabold text-white text-center mb-12">Lo que dicen los abogados</h2>
-        <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
-          {testimonials.map((t) => (
-            <div key={t.name} className="rounded-xl border border-white/8 bg-white/[0.02] p-6">
-              <p className="text-sm text-white/50 leading-relaxed italic">&ldquo;{t.quote}&rdquo;</p>
-              <div className="mt-4 flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-indigo-600/20 flex items-center justify-center text-indigo-400 text-sm font-bold">
-                  {t.name[0]}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white">{t.name}</p>
-                  <p className="text-xs text-white/40">{t.role}</p>
-                </div>
+    <section className="py-28 lg:py-36">
+      <div className="max-w-5xl mx-auto px-6 lg:px-10">
+        <div className="section-num reveal">§ 09 — CLIENTES</div>
+        <div className="mt-10 divide-y divide-[#E5E5E5]">
+          {items.map((t, i) => (
+            <figure
+              key={i}
+              className="py-14 reveal grid lg:grid-cols-12 gap-8 items-start"
+            >
+              <span
+                className="lg:col-span-1 text-[120px] text-[#B54534] leading-[0.4] serif"
+                aria-hidden
+              >
+                “
+              </span>
+              <div className="lg:col-span-11">
+                <blockquote className="serif text-[36px] sm:text-[52px] text-ink leading-[1.05] tracking-tight">
+                  {t.quote} <span className="serif-u">{t.quoteEm}</span>
+                  {t.quoteTail}
+                </blockquote>
+                <figcaption className="mt-7 font-mono-j text-[12px] text-[#6B6B6B] tracking-wide">
+                  {t.attribution}
+                </figcaption>
               </div>
-            </div>
+            </figure>
           ))}
         </div>
       </div>
