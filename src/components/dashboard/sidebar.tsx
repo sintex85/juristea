@@ -7,7 +7,9 @@ import {
   Briefcase,
   Bell,
   CalendarClock,
+  Calendar,
   Users,
+  Contact,
   Clock,
   Settings,
   CreditCard,
@@ -18,10 +20,12 @@ import { Logo } from "@/components/logo"
 
 export const navItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Inicio",          href: "/dashboard",              icon: LayoutDashboard },
+  { label: "Agenda",          href: "/dashboard/agenda",       icon: Calendar },
   { label: "Expedientes",     href: "/dashboard/cases",        icon: Briefcase },
   { label: "Notificaciones",  href: "/dashboard/notifications", icon: Bell },
   { label: "Plazos",          href: "/dashboard/deadlines",    icon: CalendarClock },
   { label: "Clientes",        href: "/dashboard/clients",      icon: Users },
+  { label: "Contactos",       href: "/dashboard/contacts",     icon: Contact },
   { label: "Tiempo",          href: "/dashboard/time",         icon: Clock },
   { label: "Ajustes",         href: "/dashboard/settings",     icon: Settings },
   { label: "Facturación",     href: "/dashboard/billing",      icon: CreditCard },
