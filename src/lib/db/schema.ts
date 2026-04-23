@@ -242,6 +242,112 @@ export const timeEntries = pgTable("time_entries", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
+// ============================================
+// Agenda & Contacts
+// ============================================
+
+export const eventTypeEnum = pgEnum("event_type", [
+  "vista",
+  "juicio",
+  "reunion",
+  "llamada",
+  "plazo",
+  "declaracion",
+  "mediacion",
+  "otro",
+])
+
+export const contactRoleEnum = pgEnum("contact_role", [
+  "cliente",
+  "contrario",
+  "procurador",
+  "perito",
+  "testigo",
+  "notario",
+  "mediador",
+  "otro",
+])
+
+export const events = pgTable("events", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  caseId: text("case_id").references(() => cases.id, { onDelete: "set null" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  type: eventTypeEnum("type").default("otro").notNull(),
+  location: text("location"),
+  startAt: timestamp("start_at").notNull(),
+  endAt: timestamp("end_at"),
+  allDay: boolean("all_day").default(false).notNull(),
+  color: text("color"),
+  remindMinutesBefore: integer("remind_minutes_before").default(60),
+  whatsappReminder: boolean("whatsapp_reminder").default(false).notNull(),
+  completed: boolean("completed").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+export const contacts = pgTable("contacts", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  clientId: text("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  caseId: text("case_id").references(() => cases.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  role: contactRoleEnum("role").default("otro").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  whatsapp: text("whatsapp"),
+  company: text("company"),
+  notes: text("notes"),
+  lastContactedAt: timestamp("last_contacted_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+export const eventContacts = pgTable(
+  "event_contacts",
+  {
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    contactId: text("contact_id")
+      .notNull()
+      .references(() => contacts.id, { onDelete: "cascade" }),
+  },
+  (ec) => [primaryKey({ columns: [ec.eventId, ec.contactId] })]
+)
+
+export const whatsappMessages = pgTable("whatsapp_messages", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  contactId: text("contact_id").references(() => contacts.id, {
+    onDelete: "set null",
+  }),
+  eventId: text("event_id").references(() => events.id, {
+    onDelete: "set null",
+  }),
+  phone: text("phone").notNull(),
+  message: text("message").notNull(),
+  direction: text("direction").notNull(), // "outgoing" | "incoming"
+  status: text("status").default("pending").notNull(), // "pending" | "sent" | "delivered" | "read" | "failed"
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
 export const notificationSettings = pgTable("notification_settings", {
   id: text("id")
     .primaryKey()
@@ -280,6 +386,9 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   deadlines: many(deadlines),
   documents: many(documents),
   timeEntries: many(timeEntries),
+  events: many(events),
+  contacts: many(contacts),
+  whatsappMessages: many(whatsappMessages),
   notificationSettings: one(notificationSettings),
 }))
 
@@ -344,6 +453,32 @@ export const documentsRelations = relations(documents, ({ one }) => ({
 export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
   user: one(users, { fields: [timeEntries.userId], references: [users.id] }),
   case: one(cases, { fields: [timeEntries.caseId], references: [cases.id] }),
+}))
+
+export const eventsRelations = relations(events, ({ one, many }) => ({
+  user: one(users, { fields: [events.userId], references: [users.id] }),
+  case: one(cases, { fields: [events.caseId], references: [cases.id] }),
+  eventContacts: many(eventContacts),
+  whatsappMessages: many(whatsappMessages),
+}))
+
+export const contactsRelations = relations(contacts, ({ one, many }) => ({
+  user: one(users, { fields: [contacts.userId], references: [users.id] }),
+  client: one(clients, { fields: [contacts.clientId], references: [clients.id] }),
+  case: one(cases, { fields: [contacts.caseId], references: [cases.id] }),
+  eventContacts: many(eventContacts),
+  whatsappMessages: many(whatsappMessages),
+}))
+
+export const eventContactsRelations = relations(eventContacts, ({ one }) => ({
+  event: one(events, { fields: [eventContacts.eventId], references: [events.id] }),
+  contact: one(contacts, { fields: [eventContacts.contactId], references: [contacts.id] }),
+}))
+
+export const whatsappMessagesRelations = relations(whatsappMessages, ({ one }) => ({
+  user: one(users, { fields: [whatsappMessages.userId], references: [users.id] }),
+  contact: one(contacts, { fields: [whatsappMessages.contactId], references: [contacts.id] }),
+  event: one(events, { fields: [whatsappMessages.eventId], references: [events.id] }),
 }))
 
 export const notificationSettingsRelations = relations(
