@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { lexnetNotifications, cases } from "@/lib/db/schema"
 import { eq, desc } from "drizzle-orm"
+import { LexnetUploader } from "./uploader"
 
 export default async function NotificationsPage() {
   const session = await auth()
@@ -25,30 +26,63 @@ export default async function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Notificaciones LexNET</h1>
-        <p className="text-muted-foreground text-sm mt-0.5">{notifications.length} notificacion{notifications.length !== 1 ? "es" : ""}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Notificaciones LexNET</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            {notifications.length} notificacion
+            {notifications.length !== 1 ? "es" : ""}
+          </p>
+        </div>
+        <LexnetUploader />
       </div>
 
       {notifications.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 p-10 text-center text-muted-foreground">
-          <p className="text-sm">No hay notificaciones aún.</p>
-          <p className="text-sm mt-1">Sube un ZIP de LexNET para importar notificaciones.</p>
+          <div className="mx-auto w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
+            <svg
+              className="h-6 w-6 text-indigo-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+          </div>
+          <p className="text-sm font-medium">No hay notificaciones aún</p>
+          <p className="text-sm mt-1">
+            Descarga el ZIP de LexNET y súbelo aquí. Extraeremos los datos y
+            calcularemos los plazos automáticamente.
+          </p>
         </div>
       ) : (
         <div className="rounded-xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50 overflow-hidden">
           {notifications.map((n) => (
-            <div key={n.id} className={`flex items-center gap-4 px-5 py-4 ${!n.read ? "bg-indigo-50/30" : ""}`}>
-              <div className={`h-2 w-2 rounded-full shrink-0 ${n.read ? "bg-gray-200" : "bg-indigo-500"}`} />
+            <div
+              key={n.id}
+              className={`flex items-center gap-4 px-5 py-4 ${!n.read ? "bg-indigo-50/30" : ""}`}
+            >
+              <div
+                className={`h-2 w-2 rounded-full shrink-0 ${n.read ? "bg-gray-200" : "bg-indigo-500"}`}
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground/90 truncate">{n.subject}</p>
+                <p className="text-sm font-semibold text-foreground/90 truncate">
+                  {n.subject}
+                </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {n.sender && `${n.sender} · `}
                   {n.caseTitle && `${n.caseTitle} · `}
                   {new Date(n.receivedAt).toLocaleDateString("es-ES")}
                 </p>
               </div>
-              <span className="text-xs text-muted-foreground shrink-0 capitalize">{n.type}</span>
+              <span className="text-xs text-muted-foreground shrink-0 capitalize">
+                {n.type}
+              </span>
             </div>
           ))}
         </div>
