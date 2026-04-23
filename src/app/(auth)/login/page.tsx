@@ -21,7 +21,7 @@ export default function LoginPage() {
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    await signIn("resend", { email, callbackUrl: "/dashboard" })
+    await signIn("nodemailer", { email, callbackUrl: "/dashboard" })
     setLoading(false)
   }
 

@@ -1,15 +1,9 @@
 import { db } from "@/lib/db"
 import { notificationSettings, users } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
-import { Resend } from "resend"
+import { getTransporter, getFrom, isEmailConfigured } from "@/lib/email/smtp"
 import { sendSlackWebhook } from "./slack"
 import { notifyChat } from "@/lib/telegram/bot"
-
-let _resend: Resend
-function getResend() {
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
-  return _resend
-}
 
 interface StockAlert {
   productName: string
@@ -77,7 +71,7 @@ export async function dispatchAlerts(
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stochek.com"
 
   // Email alert
-  if (settings?.emailEnabled !== false && process.env.RESEND_API_KEY && process.env.EMAIL_FROM) {
+  if (settings?.emailEnabled !== false && isEmailConfigured()) {
     const changeLines = changes
       .slice(0, 10)
       .map(
@@ -87,8 +81,8 @@ export async function dispatchAlerts(
       .join("")
 
     try {
-      await getResend().emails.send({
-        from: process.env.EMAIL_FROM,
+      await getTransporter()!.sendMail({
+        from: getFrom()!,
         to: user.email,
         subject: `Stochek: ${changes.length} stock change${changes.length > 1 ? "s" : ""} detected`,
         html: `

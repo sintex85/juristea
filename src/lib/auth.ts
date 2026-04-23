@@ -1,6 +1,6 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
-import Resend from "next-auth/providers/resend"
+import Nodemailer from "next-auth/providers/nodemailer"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import { eq } from "drizzle-orm"
 import { db } from "./db"
@@ -19,7 +19,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   providers: [
     Google({ allowDangerousEmailAccountLinking: true }),
-    Resend({ from: process.env.EMAIL_FROM }),
+    Nodemailer({
+      server: {
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 587),
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM,
+    }),
   ],
   callbacks: {
     async signIn({ user, account }) {

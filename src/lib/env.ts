@@ -18,8 +18,11 @@ const serverSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   STRIPE_PRO_PRICE_ID: z.string().optional(),
 
-  // Resend (optional — email alerts degrade gracefully)
-  RESEND_API_KEY: z.string().optional(),
+  // Email (SMTP — optional, email alerts degrade gracefully)
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASSWORD: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
 
   // Telegram (optional — telegram alerts degrade gracefully)
