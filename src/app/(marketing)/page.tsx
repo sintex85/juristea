@@ -8,6 +8,7 @@ import { Spain } from "@/components/landing/spain"
 import { Pricing } from "@/components/landing/pricing"
 import { Testimonials } from "@/components/landing/testimonials"
 import { FAQ } from "@/components/landing/faq"
+import { Contact } from "@/components/landing/contact"
 import { CTA } from "@/components/landing/cta"
 
 export default function HomePage() {
@@ -23,6 +24,7 @@ export default function HomePage() {
       <Pricing />
       <Testimonials />
       <FAQ />
+      <Contact />
       <CTA />
     </>
   )

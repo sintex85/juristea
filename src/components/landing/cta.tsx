@@ -37,9 +37,12 @@ export function CTA() {
               Agendar demo de 20 min
               <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
             </a>
-            <div className="font-mono-j text-[11px] text-[#9A9A9A] mt-2">
-              — o escríbenos a hola@juristea.com
-            </div>
+            <a
+              href="tel:+34960730239"
+              className="font-mono-j text-[11px] text-[#9A9A9A] mt-2 hover:text-white transition-colors"
+            >
+              — o llámanos al 960 73 02 39
+            </a>
           </div>
         </div>
       </div>

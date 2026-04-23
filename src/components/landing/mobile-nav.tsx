@@ -9,7 +9,7 @@ const links = [
   { href: "#plazos", label: "Plazos" },
   { href: "#lexnet", label: "Lexnet" },
   { href: "#precios", label: "Precios" },
-  { href: "#recursos", label: "Recursos" },
+  { href: "#contacto", label: "Contacto" },
 ]
 
 export function MobileNav() {

@@ -54,7 +54,7 @@ export default function MarketingLayout({
               <a href="#plazos" className="navlink hover:text-ink">Plazos</a>
               <a href="#lexnet" className="navlink hover:text-ink">Lexnet</a>
               <a href="#precios" className="navlink hover:text-ink">Precios</a>
-              <a href="#recursos" className="navlink hover:text-ink">Recursos</a>
+              <a href="#contacto" className="navlink hover:text-ink">Contacto</a>
             </nav>
 
             <div className="hidden md:flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function MarketingLayout({
               items={[
                 { href: "#", label: "Sobre Juristea" },
                 { href: "#", label: "Blog" },
-                { href: "mailto:hola@juristea.com", label: "Contacto" },
+                { href: "#contacto", label: "Contacto" },
                 { href: "#", label: "Empleo" },
               ]}
             />
