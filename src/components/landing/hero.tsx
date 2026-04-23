@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import {
   ArrowRight,
   Lock,
@@ -11,6 +12,13 @@ import {
   Users,
   ChevronRight,
 } from "lucide-react"
+
+const PHOTO_AM =
+  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&q=80&auto=format"
+const PHOTO_MG =
+  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80&auto=format"
+const PHOTO_JF =
+  "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80&auto=format"
 
 export function Hero() {
   return (
@@ -221,8 +229,14 @@ function HeroMockup() {
             <div className="px-5 py-4 border-b border-[#E5E5E5]">
               <div className="text-[11px] font-mono-j text-[#6B6B6B] mb-3">CLIENTE</div>
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-ink text-white text-[11px] flex items-center justify-center font-medium">
-                  AM
+                <span className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-[#E5E5E5] shrink-0">
+                  <Image
+                    src={PHOTO_AM}
+                    alt="Antonio Martínez Ruiz"
+                    fill
+                    sizes="32px"
+                    className="object-cover grayscale"
+                  />
                 </span>
                 <div>
                   <div className="text-[13px] text-ink">Antonio Martínez Ruiz</div>
@@ -233,8 +247,24 @@ function HeroMockup() {
             <div className="px-5 py-4">
               <div className="text-[11px] font-mono-j text-[#6B6B6B] mb-3">EQUIPO</div>
               <div className="flex -space-x-2">
-                <span className="w-7 h-7 rounded-full bg-[#B54534] text-white text-[10px] flex items-center justify-center ring-2 ring-white">MG</span>
-                <span className="w-7 h-7 rounded-full bg-ink text-white text-[10px] flex items-center justify-center ring-2 ring-white">JF</span>
+                <span className="relative w-7 h-7 rounded-full overflow-hidden ring-2 ring-white shrink-0">
+                  <Image
+                    src={PHOTO_MG}
+                    alt="María González"
+                    fill
+                    sizes="28px"
+                    className="object-cover grayscale"
+                  />
+                </span>
+                <span className="relative w-7 h-7 rounded-full overflow-hidden ring-2 ring-white shrink-0">
+                  <Image
+                    src={PHOTO_JF}
+                    alt="Javier Fernández"
+                    fill
+                    sizes="28px"
+                    className="object-cover grayscale"
+                  />
+                </span>
                 <span className="w-7 h-7 rounded-full bg-[#6B6B6B] text-white text-[10px] flex items-center justify-center ring-2 ring-white">+2</span>
               </div>
             </div>
