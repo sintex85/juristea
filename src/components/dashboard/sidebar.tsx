@@ -3,73 +3,161 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  LayoutDashboard,
-  Briefcase,
-  Bell,
+  Home,
+  Folders,
   CalendarClock,
+  Inbox,
   Calendar,
   Users,
-  Contact,
-  Clock,
+  Receipt,
+  Euro,
+  FileText,
   Settings,
-  CreditCard,
+  LifeBuoy,
+  ChevronsUpDown,
+  LogOut,
   type LucideIcon,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Logo } from "@/components/logo"
+import { signOut } from "next-auth/react"
 
-export const navItems: { label: string; href: string; icon: LucideIcon }[] = [
-  { label: "Inicio",          href: "/dashboard",              icon: LayoutDashboard },
-  { label: "Agenda",          href: "/dashboard/agenda",       icon: Calendar },
-  { label: "Expedientes",     href: "/dashboard/cases",        icon: Briefcase },
-  { label: "Notificaciones",  href: "/dashboard/notifications", icon: Bell },
-  { label: "Plazos",          href: "/dashboard/deadlines",    icon: CalendarClock },
-  { label: "Clientes",        href: "/dashboard/clients",      icon: Users },
-  { label: "Contactos",       href: "/dashboard/contacts",     icon: Contact },
-  { label: "Tiempo",          href: "/dashboard/time",         icon: Clock },
-  { label: "Ajustes",         href: "/dashboard/settings",     icon: Settings },
-  { label: "Facturación",     href: "/dashboard/billing",      icon: CreditCard },
+type NavItem = {
+  label: string
+  href: string
+  icon: LucideIcon
+  count?: number
+  badge?: { value: string; tone: "clay" | "dark" }
+}
+
+export const navItems: NavItem[] = [
+  { label: "Inicio", href: "/dashboard", icon: Home },
+  { label: "Expedientes", href: "/dashboard/cases", icon: Folders, count: 47 },
+  {
+    label: "Plazos",
+    href: "/dashboard/deadlines",
+    icon: CalendarClock,
+    badge: { value: "3", tone: "clay" },
+  },
+  {
+    label: "Lexnet",
+    href: "/dashboard/notifications",
+    icon: Inbox,
+    badge: { value: "12", tone: "dark" },
+  },
+  { label: "Agenda", href: "/dashboard/agenda", icon: Calendar },
+  { label: "Clientes", href: "/dashboard/clients", icon: Users },
+  { label: "Minutas", href: "/dashboard/billing", icon: Receipt },
+  { label: "Honorarios", href: "/dashboard/time", icon: Euro },
+  { label: "Documentos", href: "/dashboard/contacts", icon: FileText },
 ]
 
-export function Sidebar({ mobile = false }: { mobile?: boolean }) {
+const settingsItems: NavItem[] = [
+  { label: "Ajustes", href: "/dashboard/settings", icon: Settings },
+  { label: "Ayuda", href: "/dashboard/help", icon: LifeBuoy },
+]
+
+export function Sidebar({
+  user,
+  onNavigate,
+}: {
+  user: { name: string | null; email: string; initials: string; firmName?: string; firmMeta?: string }
+  onNavigate?: () => void
+}) {
   const pathname = usePathname()
 
   return (
-    <aside className={cn(
-      "w-56 shrink-0 flex-col bg-sidebar text-sidebar-foreground",
-      mobile ? "flex h-full" : "hidden md:flex border-r border-sidebar-border"
-    )}>
-      <div className="flex h-16 items-center px-5 border-b border-sidebar-border">
-        <Link href="/dashboard" className="flex items-center text-white">
-          <Logo className="h-7" />
-        </Link>
+    <aside className="w-[240px] shrink-0 bg-[#F5F1EA] border-r border-[#E5E5E5] flex flex-col h-full">
+      <div className="px-5 pt-5 pb-4">
+        <div className="flex items-baseline gap-1.5">
+          <span className="jur-serif text-[26px] text-[#0A0A0A]">Juristea</span>
+          <span className="jur-mono text-[10px] text-[#A0A0A0]">v26.1</span>
+        </div>
+        <button
+          type="button"
+          className="mt-2 w-full flex items-center gap-2 text-left group"
+        >
+          <div className="flex-1 min-w-0">
+            <div className="jur-mono text-[10.5px] text-[#6B6B6B] uppercase tracking-wider truncate">
+              {user.firmName ?? "Despacho"}
+            </div>
+            <div className="jur-mono text-[10.5px] text-[#A0A0A0] truncate">
+              {user.firmMeta ?? "MADRID"}
+            </div>
+          </div>
+          <ChevronsUpDown className="w-3.5 h-3.5 text-[#A0A0A0] group-hover:text-[#0A0A0A]" />
+        </button>
       </div>
 
-      <nav className="flex flex-col gap-1 p-3 flex-1 mt-2">
-        {navItems.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-semibold transition-all",
-                active
-                  ? "bg-indigo-500 text-white shadow-[0_0_16px_rgba(79,70,229,0.30)]"
-                  : "text-white/50 hover:bg-white/8 hover:text-white/90"
-              )}
-            >
-              <Icon
-                className={cn(
-                  "h-4 w-4 shrink-0 transition-colors",
-                  active ? "text-white" : "text-white/30 group-hover:text-white/70"
-                )}
-              />
-              {label}
-            </Link>
-          )
-        })}
-      </nav>
+      <div className="mx-5 border-t border-[#E5E5E5]" />
+
+      <div className="px-3 pt-4 flex-1 overflow-y-auto jur-nice-scroll">
+        <div className="px-3 pb-2 jur-mono text-[10px] text-[#A0A0A0] tracking-wider uppercase">
+          Navegación
+        </div>
+        <nav className="space-y-0.5">
+          {navItems.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} onClick={onNavigate} />
+          ))}
+        </nav>
+
+        <div className="mx-3 mt-5 mb-3 border-t border-[#E5E5E5]" />
+
+        <nav className="space-y-0.5">
+          {settingsItems.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} onClick={onNavigate} />
+          ))}
+        </nav>
+      </div>
+
+      <div className="p-3 border-t border-[#E5E5E5]">
+        <div className="flex items-center gap-2.5 px-2 py-1.5">
+          <span className="w-8 h-8 rounded-full bg-[#0A0A0A] text-white text-[11px] font-medium flex items-center justify-center shrink-0">
+            {user.initials}
+          </span>
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] text-[#0A0A0A] font-medium truncate">
+              {user.name ?? user.email.split("@")[0]}
+            </div>
+            <div className="jur-mono text-[10.5px] text-[#A0A0A0] truncate">
+              SOCIA · COLEG. 82.144
+            </div>
+          </div>
+          <button
+            type="button"
+            className="text-[#A0A0A0] hover:text-[#0A0A0A]"
+            aria-label="Salir"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            <LogOut className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
     </aside>
+  )
+}
+
+function NavLink({
+  item,
+  pathname,
+  onClick,
+}: {
+  item: NavItem
+  pathname: string
+  onClick?: () => void
+}) {
+  const Icon = item.icon
+  const active = pathname === item.href
+  return (
+    <Link
+      href={item.href}
+      onClick={onClick}
+      className={`jur-nav-item${active ? " is-active" : ""}`}
+    >
+      <Icon className="w-4 h-4" />
+      <span>{item.label}</span>
+      {item.count !== undefined && <span className="jur-nav-count">{item.count}</span>}
+      {item.badge && (
+        <span className={`jur-nav-badge ${item.badge.tone}`}>{item.badge.value}</span>
+      )}
+    </Link>
   )
 }
