@@ -1,6 +1,7 @@
 import { Hero } from "@/components/landing/hero"
 import { Marquee } from "@/components/landing/marquee"
 import { StatusQuo } from "@/components/landing/status-quo"
+import { InPractice } from "@/components/landing/in-practice"
 import { Features } from "@/components/landing/features"
 import { Security } from "@/components/landing/security"
 import { Spain } from "@/components/landing/spain"
@@ -15,6 +16,7 @@ export default function HomePage() {
       <Hero />
       <Marquee />
       <StatusQuo />
+      <InPractice />
       <Features />
       <Security />
       <Spain />
