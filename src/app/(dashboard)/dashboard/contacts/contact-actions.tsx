@@ -113,9 +113,9 @@ export function ContactActions({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-500 transition-colors"
+        className="jur-btn-solid"
       >
-        <Plus className="h-4 w-4" />
+        <Plus className="w-3.5 h-3.5" />
         Nuevo contacto
       </button>
 
@@ -167,11 +167,11 @@ export function ContactActions({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Nombre *</label>
-                  <input name="name" required className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <input name="name" required className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B54534]/40" />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Rol</label>
-                  <select name="role" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <select name="role" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B54534]/40">
                     {roles.map((r) => (
                       <option key={r.value} value={r.value}>{r.label}</option>
                     ))}
@@ -182,31 +182,31 @@ export function ContactActions({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Email</label>
-                  <input name="email" type="email" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <input name="email" type="email" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B54534]/40" />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Teléfono</label>
-                  <input name="phone" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="612 345 678" />
+                  <input name="phone" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B54534]/40" placeholder="612 345 678" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">WhatsApp</label>
-                  <input name="whatsapp" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="+34 612 345 678" />
+                  <input name="whatsapp" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B54534]/40" placeholder="+34 612 345 678" />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Empresa</label>
-                  <input name="company" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  <input name="company" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B54534]/40" />
                 </div>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Notas</label>
-                <textarea name="notes" rows={2} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
+                <textarea name="notes" rows={2} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B54534]/40 resize-none" />
               </div>
 
-              <button type="submit" disabled={loading} className="w-full h-10 rounded-lg bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-500 transition-colors disabled:opacity-50">
+              <button type="submit" disabled={loading} className="w-full h-10 rounded-lg bg-[#0A0A0A] text-sm font-medium text-white hover:bg-[#1a1a1a] transition-colors disabled:opacity-50">
                 {loading ? "Creando..." : "Crear contacto"}
               </button>
             </form>

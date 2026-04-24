@@ -1,29 +1,21 @@
+import { Mail, Phone, Building2, MessageCircle } from "lucide-react"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { contacts } from "@/lib/db/schema"
 import { eq, desc } from "drizzle-orm"
 import { ContactActions } from "./contact-actions"
 
-const roleLabels: Record<string, string> = {
-  cliente: "Cliente",
-  contrario: "Contrario",
-  procurador: "Procurador",
-  perito: "Perito",
-  testigo: "Testigo",
-  notario: "Notario",
-  mediador: "Mediador",
-  otro: "Otro",
-}
+type BadgeTone = "ok" | "warn" | "gray" | "clay"
 
-const roleColors: Record<string, string> = {
-  cliente: "bg-indigo-50 text-indigo-600",
-  contrario: "bg-red-50 text-red-600",
-  procurador: "bg-emerald-50 text-emerald-600",
-  perito: "bg-purple-50 text-purple-600",
-  testigo: "bg-amber-50 text-amber-600",
-  notario: "bg-blue-50 text-blue-600",
-  mediador: "bg-teal-50 text-teal-600",
-  otro: "bg-gray-50 text-gray-600",
+const roles: Record<string, { label: string; tone: BadgeTone }> = {
+  cliente: { label: "Cliente", tone: "gray" },
+  contrario: { label: "Contrario", tone: "clay" },
+  procurador: { label: "Procurador", tone: "ok" },
+  perito: { label: "Perito", tone: "warn" },
+  testigo: { label: "Testigo", tone: "warn" },
+  notario: { label: "Notario", tone: "gray" },
+  mediador: { label: "Mediador", tone: "ok" },
+  otro: { label: "Otro", tone: "gray" },
 }
 
 export default async function ContactsPage() {
@@ -38,65 +30,89 @@ export default async function ContactsPage() {
     .orderBy(desc(contacts.updatedAt))
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-[1440px] w-full mx-auto px-6 lg:px-12 py-10 lg:py-12">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">Contactos</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            {allContacts.length} contacto{allContacts.length !== 1 ? "s" : ""}
+          <div className="jur-mono-label">CONTACTOS</div>
+          <h1 className="jur-display text-[48px] sm:text-[56px] text-[#0A0A0A] mt-3">
+            Tu <em>agenda profesional</em>.
+          </h1>
+          <p className="mt-3 text-[14.5px] text-[#6B6B6B]">
+            {allContacts.length} contacto{allContacts.length !== 1 ? "s" : ""} · procuradores, peritos,
+            notarios, contrarios…
           </p>
         </div>
         <ContactActions mode="add" />
       </div>
 
-      {allContacts.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 p-10 text-center text-muted-foreground">
-          <p className="text-sm font-medium">No tienes contactos aún</p>
-          <p className="text-sm mt-1">
-            Añade procuradores, peritos, testigos y otros contactos profesionales.
-          </p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50 overflow-hidden">
-          {allContacts.map((c) => (
-            <div key={c.id} className="flex items-center gap-4 px-5 py-4">
-              <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-sm font-bold shrink-0">
-                {c.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground/90 truncate">
-                    {c.name}
-                  </p>
-                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${roleColors[c.role] || roleColors.otro}`}>
-                    {roleLabels[c.role] || c.role}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {c.email && `${c.email} · `}
-                  {c.phone && `📞 ${c.phone}`}
-                  {c.whatsapp && ` · 💬 ${c.whatsapp}`}
-                  {c.company && ` · ${c.company}`}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {c.whatsapp && (
-                  <ContactActions mode="whatsapp" contactId={c.id} phone={c.whatsapp} name={c.name} />
-                )}
-                {c.phone && !c.whatsapp && (
-                  <a
-                    href={`tel:${c.phone}`}
-                    className="inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-gray-100 transition-colors text-muted-foreground"
-                    title="Llamar"
+      <div className="mt-8 jur-card overflow-hidden">
+        {allContacts.length === 0 ? (
+          <div className="p-14 text-center">
+            <p className="jur-serif text-[22px] text-[#0A0A0A]">Aún no hay contactos.</p>
+            <p className="mt-2 text-[14px] text-[#6B6B6B] max-w-md mx-auto">
+              Guarda aquí procuradores, peritos, notarios y contrarios. Los tendrás a mano desde
+              cualquier expediente.
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-[#EFEFEF]">
+            {allContacts.map((c) => {
+              const role = roles[c.role] ?? { label: c.role, tone: "gray" as BadgeTone }
+              return (
+                <li
+                  key={c.id}
+                  className="flex items-center gap-4 px-6 py-4 jur-row-hover"
+                >
+                  <span
+                    className={`jur-badge jur-badge-${role.tone} shrink-0 min-w-[88px] justify-center`}
                   >
-                    📞
-                  </a>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                    {role.label}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[14px] text-[#0A0A0A] font-medium truncate">
+                      {c.name}
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 jur-mono text-[11px] text-[#6B6B6B]">
+                      {c.company && (
+                        <span className="inline-flex items-center gap-1">
+                          <Building2 className="w-3 h-3" />
+                          {c.company}
+                        </span>
+                      )}
+                      {c.email && (
+                        <span className="inline-flex items-center gap-1 truncate max-w-[240px]">
+                          <Mail className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{c.email}</span>
+                        </span>
+                      )}
+                      {c.phone && (
+                        <span className="inline-flex items-center gap-1">
+                          <Phone className="w-3 h-3" />
+                          {c.phone}
+                        </span>
+                      )}
+                      {c.whatsapp && (
+                        <span className="inline-flex items-center gap-1 text-[#10B981]">
+                          <MessageCircle className="w-3 h-3" />
+                          {c.whatsapp}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {c.whatsapp && (
+                    <ContactActions
+                      mode="whatsapp"
+                      contactId={c.id}
+                      phone={c.whatsapp}
+                      name={c.name}
+                    />
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }

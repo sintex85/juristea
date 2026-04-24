@@ -1,8 +1,17 @@
+import Link from "next/link"
+import { Plus, ArrowRight } from "lucide-react"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { cases, clients } from "@/lib/db/schema"
 import { eq, desc } from "drizzle-orm"
-import Link from "next/link"
+
+type BadgeTone = "ok" | "warn" | "gray" | "clay"
+
+const statusLabel: Record<string, { label: string; tone: BadgeTone }> = {
+  active: { label: "Activo", tone: "ok" },
+  archived: { label: "Archivado", tone: "gray" },
+  closed: { label: "Cerrado", tone: "clay" },
+}
 
 export default async function CasesPage() {
   const session = await auth()
@@ -18,72 +27,101 @@ export default async function CasesPage() {
       jurisdiction: cases.jurisdiction,
       status: cases.status,
       clientName: clients.name,
-      createdAt: cases.createdAt,
+      updatedAt: cases.updatedAt,
     })
     .from(cases)
     .leftJoin(clients, eq(cases.clientId, clients.id))
     .where(eq(cases.userId, userId))
     .orderBy(desc(cases.updatedAt))
 
+  const active = allCases.filter((c) => c.status === "active").length
+  const archived = allCases.filter((c) => c.status === "archived").length
+  const closed = allCases.filter((c) => c.status === "closed").length
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-[1440px] w-full mx-auto px-6 lg:px-12 py-10 lg:py-12">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">Expedientes</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">{allCases.length} expediente{allCases.length !== 1 ? "s" : ""}</p>
+          <div className="jur-mono-label">EXPEDIENTES</div>
+          <h1 className="jur-display text-[48px] sm:text-[56px] text-[#0A0A0A] mt-3">
+            Todos los <em>expedientes</em>.
+          </h1>
+          <p className="mt-3 text-[14.5px] text-[#6B6B6B]">
+            {allCases.length} expediente{allCases.length !== 1 ? "s" : ""} ·{" "}
+            <span className="text-[#10B981]">{active} activos</span> ·{" "}
+            <span>{archived} archivados</span> · <span>{closed} cerrados</span>
+          </p>
         </div>
-        <Link
-          href="/dashboard/cases/new"
-          className="inline-flex items-center justify-center h-9 px-4 rounded-lg bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-500 transition-colors"
-        >
-          + Nuevo expediente
+        <Link href="/dashboard/cases/new" className="jur-btn-solid">
+          <Plus className="w-3.5 h-3.5" /> Nuevo expediente{" "}
+          <ArrowRight className="w-3.5 h-3.5 arr" />
         </Link>
       </div>
 
-      {allCases.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 p-10 text-center text-muted-foreground">
-          <p className="text-sm">No tienes expedientes aún.</p>
-          <p className="text-sm mt-1">Crea tu primer expediente para empezar a gestionar tu despacho.</p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 text-left">
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Expediente</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Cliente</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground hidden md:table-cell">Juzgado</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground hidden lg:table-cell">N.º</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Estado</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {allCases.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50/80 transition-colors">
-                  <td className="px-5 py-4">
-                    <Link href={`/dashboard/cases/${c.id}`} className="font-semibold text-foreground hover:text-indigo-600 transition-colors">
-                      {c.title}
+      <div className="mt-8 jur-card overflow-hidden">
+        {allCases.length === 0 ? (
+          <div className="p-14 text-center">
+            <p className="jur-serif text-[22px] text-[#0A0A0A]">
+              Aún no hay expedientes.
+            </p>
+            <p className="mt-2 text-[14px] text-[#6B6B6B]">
+              Empieza dando de alta el primero.
+            </p>
+            <Link
+              href="/dashboard/cases/new"
+              className="inline-flex mt-5 jur-btn-solid"
+            >
+              <Plus className="w-3.5 h-3.5" /> Crear expediente
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-12 gap-3 px-6 py-3 jur-mono text-[10px] text-[#6B6B6B] tracking-wider uppercase border-b border-[#E5E5E5]">
+              <div className="col-span-4">Expediente</div>
+              <div className="col-span-3">Cliente</div>
+              <div className="col-span-2 hidden md:block">Juzgado</div>
+              <div className="col-span-2 hidden lg:block">Nº</div>
+              <div className="col-span-1 text-right">Estado</div>
+            </div>
+            <ul className="divide-y divide-[#EFEFEF]">
+              {allCases.map((c) => {
+                const s = statusLabel[c.status] ?? { label: c.status, tone: "gray" as BadgeTone }
+                return (
+                  <li key={c.id}>
+                    <Link
+                      href={`/dashboard/cases/${c.id}`}
+                      className="grid grid-cols-12 gap-3 px-6 py-4 jur-row-hover items-center"
+                    >
+                      <div className="col-span-4 min-w-0">
+                        <div className="text-[14px] text-[#0A0A0A] font-medium truncate">
+                          {c.title}
+                        </div>
+                        {c.jurisdiction && (
+                          <div className="jur-mono text-[10.5px] text-[#A0A0A0] mt-0.5">
+                            {c.jurisdiction}
+                          </div>
+                        )}
+                      </div>
+                      <div className="col-span-3 text-[13px] text-[#6B6B6B] truncate">
+                        {c.clientName ?? "—"}
+                      </div>
+                      <div className="col-span-2 text-[12.5px] text-[#6B6B6B] hidden md:block truncate">
+                        {c.court ?? "—"}
+                      </div>
+                      <div className="col-span-2 jur-mono text-[11.5px] text-[#0A0A0A] hidden lg:block">
+                        {c.caseNumber ?? "—"}
+                      </div>
+                      <div className="col-span-1 flex justify-end">
+                        <span className={`jur-badge jur-badge-${s.tone}`}>{s.label}</span>
+                      </div>
                     </Link>
-                    {c.jurisdiction && <span className="ml-2 text-xs text-muted-foreground">{c.jurisdiction}</span>}
-                  </td>
-                  <td className="px-5 py-4 text-muted-foreground">{c.clientName}</td>
-                  <td className="px-5 py-4 text-muted-foreground hidden md:table-cell">{c.court || "—"}</td>
-                  <td className="px-5 py-4 text-muted-foreground hidden lg:table-cell font-mono text-xs">{c.caseNumber || "—"}</td>
-                  <td className="px-5 py-4">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
-                      c.status === "active" ? "bg-emerald-50 text-emerald-600" :
-                      c.status === "archived" ? "bg-gray-50 text-gray-500" :
-                      "bg-red-50 text-red-600"
-                    }`}>
-                      {c.status === "active" ? "Activo" : c.status === "archived" ? "Archivado" : "Cerrado"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                  </li>
+                )
+              })}
+            </ul>
+          </>
+        )}
+      </div>
     </div>
   )
 }

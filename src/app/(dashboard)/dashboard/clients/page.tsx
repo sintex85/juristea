@@ -1,8 +1,9 @@
+import Link from "next/link"
+import { Plus, ArrowRight, Mail, Phone } from "lucide-react"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { clients } from "@/lib/db/schema"
 import { eq, desc, sql } from "drizzle-orm"
-import Link from "next/link"
 
 export default async function ClientsPage() {
   const session = await auth()
@@ -23,48 +24,76 @@ export default async function ClientsPage() {
     .orderBy(desc(clients.createdAt))
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-[1440px] w-full mx-auto px-6 lg:px-12 py-10 lg:py-12">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">Clientes</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">{allClients.length} cliente{allClients.length !== 1 ? "s" : ""}</p>
+          <div className="jur-mono-label">CLIENTES</div>
+          <h1 className="jur-display text-[48px] sm:text-[56px] text-[#0A0A0A] mt-3">
+            Tus <em>clientes</em>.
+          </h1>
+          <p className="mt-3 text-[14.5px] text-[#6B6B6B]">
+            {allClients.length} cliente{allClients.length !== 1 ? "s" : ""} en tu despacho
+          </p>
         </div>
-        <Link
-          href="/dashboard/clients/new"
-          className="inline-flex items-center justify-center h-9 px-4 rounded-lg bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-500 transition-colors"
-        >
-          + Nuevo cliente
+        <Link href="/dashboard/clients/new" className="jur-btn-solid">
+          <Plus className="w-3.5 h-3.5" /> Nuevo cliente{" "}
+          <ArrowRight className="w-3.5 h-3.5 arr" />
         </Link>
       </div>
 
-      {allClients.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 p-10 text-center text-muted-foreground">
-          <p className="text-sm">No tienes clientes aún. Añade tu primer cliente.</p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 text-left">
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Nombre</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground hidden md:table-cell">Email</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground hidden lg:table-cell">NIF</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Expedientes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
+      <div className="mt-8 jur-card overflow-hidden">
+        {allClients.length === 0 ? (
+          <div className="p-14 text-center">
+            <p className="jur-serif text-[22px] text-[#0A0A0A]">
+              Aún no hay clientes.
+            </p>
+            <p className="mt-2 text-[14px] text-[#6B6B6B]">
+              Añade el primer cliente para poder abrir expedientes.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-12 gap-3 px-6 py-3 jur-mono text-[10px] text-[#6B6B6B] tracking-wider uppercase border-b border-[#E5E5E5]">
+              <div className="col-span-5">Nombre</div>
+              <div className="col-span-4 hidden md:block">Contacto</div>
+              <div className="col-span-2 hidden lg:block">NIF</div>
+              <div className="col-span-1 text-right">Exp.</div>
+            </div>
+            <ul className="divide-y divide-[#EFEFEF]">
               {allClients.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50/80 transition-colors">
-                  <td className="px-5 py-4 font-semibold">{c.name}</td>
-                  <td className="px-5 py-4 text-muted-foreground hidden md:table-cell">{c.email || "—"}</td>
-                  <td className="px-5 py-4 text-muted-foreground hidden lg:table-cell font-mono text-xs">{c.nif || "—"}</td>
-                  <td className="px-5 py-4 text-muted-foreground">{Number(c.caseCount)}</td>
-                </tr>
+                <li key={c.id} className="grid grid-cols-12 gap-3 px-6 py-4 jur-row-hover items-center">
+                  <div className="col-span-5 min-w-0">
+                    <div className="text-[14px] text-[#0A0A0A] font-medium truncate">
+                      {c.name}
+                    </div>
+                  </div>
+                  <div className="col-span-4 hidden md:flex items-center gap-3 text-[12.5px] text-[#6B6B6B] min-w-0">
+                    {c.email && (
+                      <span className="inline-flex items-center gap-1 truncate">
+                        <Mail className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{c.email}</span>
+                      </span>
+                    )}
+                    {c.phone && (
+                      <span className="inline-flex items-center gap-1 shrink-0">
+                        <Phone className="w-3 h-3" />
+                        {c.phone}
+                      </span>
+                    )}
+                    {!c.email && !c.phone && <span className="text-[#A0A0A0]">—</span>}
+                  </div>
+                  <div className="col-span-2 hidden lg:block jur-mono text-[11.5px] text-[#0A0A0A]">
+                    {c.nif ?? "—"}
+                  </div>
+                  <div className="col-span-1 flex justify-end text-[13px] text-[#0A0A0A] font-medium tabular-nums">
+                    {Number(c.caseCount)}
+                  </div>
+                </li>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </ul>
+          </>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,8 +1,22 @@
+import { MapPin, Gavel, Phone, Users, FileText, CalendarClock } from "lucide-react"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { events, cases, deadlines } from "@/lib/db/schema"
 import { eq, and, gte, asc } from "drizzle-orm"
 import { AgendaClient } from "./agenda-client"
+
+type BadgeTone = "ok" | "warn" | "gray" | "clay"
+
+const typeMeta: Record<string, { label: string; tone: BadgeTone; Icon: typeof Gavel }> = {
+  vista: { label: "Vista", tone: "clay", Icon: Gavel },
+  juicio: { label: "Juicio", tone: "clay", Icon: Gavel },
+  reunion: { label: "Reunión", tone: "gray", Icon: Users },
+  llamada: { label: "Llamada", tone: "gray", Icon: Phone },
+  plazo: { label: "Plazo", tone: "warn", Icon: CalendarClock },
+  declaracion: { label: "Declaración", tone: "ok", Icon: Users },
+  mediacion: { label: "Mediación", tone: "ok", Icon: Users },
+  otro: { label: "Otro", tone: "gray", Icon: FileText },
+}
 
 export default async function AgendaPage() {
   const session = await auth()
@@ -12,7 +26,6 @@ export default async function AgendaPage() {
   const now = new Date()
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
-  // Get events
   const allEvents = await db
     .select({
       id: events.id,
@@ -33,7 +46,6 @@ export default async function AgendaPage() {
     .where(and(eq(events.userId, userId), gte(events.startAt, startOfToday)))
     .orderBy(asc(events.startAt))
 
-  // Get upcoming deadlines to show in agenda
   const upcomingDeadlines = await db
     .select({
       id: deadlines.id,
@@ -44,17 +56,14 @@ export default async function AgendaPage() {
     })
     .from(deadlines)
     .innerJoin(cases, eq(deadlines.caseId, cases.id))
-    .where(
-      and(
-        eq(deadlines.userId, userId),
-        eq(deadlines.status, "pending"),
-        gte(deadlines.dueDate, startOfToday)
-      )
-    )
+    .where(and(
+      eq(deadlines.userId, userId),
+      eq(deadlines.status, "pending"),
+      gte(deadlines.dueDate, startOfToday)
+    ))
     .orderBy(asc(deadlines.dueDate))
     .limit(20)
 
-  // Merge into a unified list
   type AgendaItem = {
     id: string
     title: string
@@ -64,7 +73,6 @@ export default async function AgendaPage() {
     location: string | null
     isDeadline: boolean
     completed: boolean
-    color: string | null
   }
 
   const items: AgendaItem[] = [
@@ -77,7 +85,6 @@ export default async function AgendaPage() {
       location: e.location,
       isDeadline: false,
       completed: e.completed,
-      color: e.color,
     })),
     ...upcomingDeadlines.map((d) => ({
       id: `dl-${d.id}`,
@@ -88,11 +95,9 @@ export default async function AgendaPage() {
       location: null,
       isDeadline: true,
       completed: d.status === "completed",
-      color: null,
     })),
   ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-  // Group by date
   const grouped: Record<string, AgendaItem[]> = {}
   for (const item of items) {
     const key = new Date(item.date).toLocaleDateString("es-ES", {
@@ -100,92 +105,84 @@ export default async function AgendaPage() {
       day: "numeric",
       month: "long",
     })
-    if (!grouped[key]) grouped[key] = []
-    grouped[key].push(item)
-  }
-
-  const eventTypeLabels: Record<string, string> = {
-    vista: "Vista oral",
-    juicio: "Juicio",
-    reunion: "Reunión",
-    llamada: "Llamada",
-    plazo: "Plazo",
-    declaracion: "Declaración",
-    mediacion: "Mediación",
-    otro: "Otro",
-  }
-
-  const eventTypeColors: Record<string, string> = {
-    vista: "bg-red-50 text-red-600 ring-red-200",
-    juicio: "bg-red-50 text-red-600 ring-red-200",
-    reunion: "bg-blue-50 text-blue-600 ring-blue-200",
-    llamada: "bg-emerald-50 text-emerald-600 ring-emerald-200",
-    plazo: "bg-amber-50 text-amber-600 ring-amber-200",
-    declaracion: "bg-purple-50 text-purple-600 ring-purple-200",
-    mediacion: "bg-teal-50 text-teal-600 ring-teal-200",
-    otro: "bg-gray-50 text-gray-600 ring-gray-200",
+    ;(grouped[key] ??= []).push(item)
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-[1440px] w-full mx-auto px-6 lg:px-12 py-10 lg:py-12">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">Agenda</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            {items.length} evento{items.length !== 1 ? "s" : ""} próximo
-            {items.length !== 1 ? "s" : ""}
+          <div className="jur-mono-label">AGENDA</div>
+          <h1 className="jur-display text-[48px] sm:text-[56px] text-[#0A0A0A] mt-3">
+            Tus próximos <em>compromisos</em>.
+          </h1>
+          <p className="mt-3 text-[14.5px] text-[#6B6B6B]">
+            {items.length} evento{items.length !== 1 ? "s" : ""} por venir ·{" "}
+            {upcomingDeadlines.length} plazo{upcomingDeadlines.length !== 1 ? "s" : ""}
           </p>
         </div>
         <AgendaClient />
       </div>
 
       {Object.keys(grouped).length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 p-10 text-center text-muted-foreground">
-          <p className="text-sm font-medium">Tu agenda está vacía</p>
-          <p className="text-sm mt-1">
-            Añade eventos como vistas, reuniones o llamadas.
+        <div className="mt-8 jur-card p-14 text-center">
+          <p className="jur-serif text-[22px] text-[#0A0A0A]">Tu agenda está vacía.</p>
+          <p className="mt-2 text-[14px] text-[#6B6B6B]">
+            Añade vistas, reuniones o llamadas para empezar a organizar la semana.
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="mt-8 space-y-8">
           {Object.entries(grouped).map(([dateLabel, dayItems]) => (
             <div key={dateLabel}>
-              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 capitalize">
+              <div className="jur-mono text-[11px] text-[#6B6B6B] uppercase tracking-wider mb-3 capitalize">
                 {dateLabel}
-              </p>
-              <div className="rounded-xl border border-gray-100 bg-white shadow-sm divide-y divide-gray-50 overflow-hidden">
-                {dayItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`flex items-center gap-4 px-5 py-4 ${item.completed ? "opacity-50" : ""}`}
-                  >
-                    <span
-                      className={`text-[10px] font-bold uppercase px-2 py-1 rounded-md ring-1 shrink-0 ${eventTypeColors[item.type] || eventTypeColors.otro}`}
-                    >
-                      {eventTypeLabels[item.type] || item.type}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm font-semibold truncate ${item.completed ? "line-through" : "text-foreground/90"}`}
+              </div>
+              <div className="jur-card overflow-hidden">
+                <ul className="divide-y divide-[#EFEFEF]">
+                  {dayItems.map((item) => {
+                    const meta = typeMeta[item.type] ?? typeMeta.otro
+                    const Icon = meta.Icon
+                    return (
+                      <li
+                        key={item.id}
+                        className={`flex items-center gap-4 px-6 py-4 jur-row-hover ${
+                          item.completed ? "opacity-50" : ""
+                        }`}
                       >
-                        {item.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {new Date(item.date).toLocaleTimeString("es-ES", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        {item.subtitle && ` · ${item.subtitle}`}
-                        {item.location && ` · 📍 ${item.location}`}
-                      </p>
-                    </div>
-                    {item.isDeadline && (
-                      <span className="text-xs text-amber-600 font-semibold shrink-0">
-                        Plazo
-                      </span>
-                    )}
-                  </div>
-                ))}
+                        <div className="w-16 shrink-0">
+                          <div className="jur-mono text-[14px] text-[#0A0A0A] font-medium leading-none">
+                            {new Date(item.date).toLocaleTimeString("es-ES", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Icon className="w-3.5 h-3.5 text-[#B54534]" />
+                          <span className={`jur-badge jur-badge-${meta.tone}`}>{meta.label}</span>
+                        </div>
+                        <div className="flex-1 min-w-0 border-l border-[#E5E5E5] pl-4">
+                          <div
+                            className={`text-[14px] ${
+                              item.completed ? "line-through text-[#A0A0A0]" : "text-[#0A0A0A]"
+                            } font-medium truncate`}
+                          >
+                            {item.title}
+                          </div>
+                          <div className="jur-mono text-[10.5px] text-[#6B6B6B] mt-1 truncate flex items-center gap-2 flex-wrap">
+                            {item.subtitle && <span>{item.subtitle}</span>}
+                            {item.location && (
+                              <span className="inline-flex items-center gap-1">
+                                <MapPin className="w-3 h-3" /> {item.location}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
             </div>
           ))}
