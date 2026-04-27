@@ -61,33 +61,38 @@ export default async function ClientsPage() {
             </div>
             <ul className="divide-y divide-[#EFEFEF]">
               {allClients.map((c) => (
-                <li key={c.id} className="grid grid-cols-12 gap-3 px-6 py-4 jur-row-hover items-center">
-                  <div className="col-span-5 min-w-0">
-                    <div className="text-[14px] text-[#0A0A0A] font-medium truncate">
-                      {c.name}
+                <li key={c.id}>
+                  <Link
+                    href={`/dashboard/clients/${c.id}`}
+                    className="grid grid-cols-12 gap-3 px-6 py-4 jur-row-hover items-center"
+                  >
+                    <div className="col-span-5 min-w-0">
+                      <div className="text-[14px] text-[#0A0A0A] font-medium truncate">
+                        {c.name}
+                      </div>
                     </div>
-                  </div>
-                  <div className="col-span-4 hidden md:flex items-center gap-3 text-[12.5px] text-[#6B6B6B] min-w-0">
-                    {c.email && (
-                      <span className="inline-flex items-center gap-1 truncate">
-                        <Mail className="w-3 h-3 shrink-0" />
-                        <span className="truncate">{c.email}</span>
-                      </span>
-                    )}
-                    {c.phone && (
-                      <span className="inline-flex items-center gap-1 shrink-0">
-                        <Phone className="w-3 h-3" />
-                        {c.phone}
-                      </span>
-                    )}
-                    {!c.email && !c.phone && <span className="text-[#A0A0A0]">—</span>}
-                  </div>
-                  <div className="col-span-2 hidden lg:block jur-mono text-[11.5px] text-[#0A0A0A]">
-                    {c.nif ?? "—"}
-                  </div>
-                  <div className="col-span-1 flex justify-end text-[13px] text-[#0A0A0A] font-medium tabular-nums">
-                    {Number(c.caseCount)}
-                  </div>
+                    <div className="col-span-4 hidden md:flex items-center gap-3 text-[12.5px] text-[#6B6B6B] min-w-0">
+                      {c.email && (
+                        <span className="inline-flex items-center gap-1 truncate">
+                          <Mail className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{c.email}</span>
+                        </span>
+                      )}
+                      {c.phone && (
+                        <span className="inline-flex items-center gap-1 shrink-0">
+                          <Phone className="w-3 h-3" />
+                          {c.phone}
+                        </span>
+                      )}
+                      {!c.email && !c.phone && <span className="text-[#A0A0A0]">—</span>}
+                    </div>
+                    <div className="col-span-2 hidden lg:block jur-mono text-[11.5px] text-[#0A0A0A]">
+                      {c.nif ?? "—"}
+                    </div>
+                    <div className="col-span-1 flex justify-end text-[13px] text-[#0A0A0A] font-medium tabular-nums">
+                      {Number(c.caseCount)}
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
