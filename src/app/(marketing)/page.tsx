@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
 import { Hero } from "@/components/landing/hero"
 import { Marquee } from "@/components/landing/marquee"
 import { StatusQuo } from "@/components/landing/status-quo"
@@ -11,7 +13,10 @@ import { FAQ } from "@/components/landing/faq"
 import { Contact } from "@/components/landing/contact"
 import { CTA } from "@/components/landing/cta"
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth()
+  if (session?.user?.id) redirect("/dashboard")
+
   return (
     <>
       <Hero />
