@@ -82,71 +82,129 @@ export default async function CaseDetailPage({
 
   if (!row) notFound()
 
-  const [
-    caseDeadlines,
-    caseEvents,
-    caseLexnet,
-    caseDocs,
-    timeAgg,
-  ] = await Promise.all([
-    db
-      .select({
-        id: deadlines.id,
-        title: deadlines.title,
-        dueDate: deadlines.dueDate,
-        status: deadlines.status,
-      })
-      .from(deadlines)
-      .where(and(eq(deadlines.caseId, row.id), eq(deadlines.userId, userId)))
-      .orderBy(asc(deadlines.dueDate)),
-    db
-      .select({
-        id: eventsTable.id,
-        title: eventsTable.title,
-        type: eventsTable.type,
-        startAt: eventsTable.startAt,
-        endAt: eventsTable.endAt,
-        location: eventsTable.location,
-        completed: eventsTable.completed,
-      })
-      .from(eventsTable)
-      .where(and(eq(eventsTable.caseId, row.id), eq(eventsTable.userId, userId)))
-      .orderBy(asc(eventsTable.startAt)),
-    db
-      .select({
-        id: lexnetNotifications.id,
-        subject: lexnetNotifications.subject,
-        sender: lexnetNotifications.sender,
-        type: lexnetNotifications.type,
-        receivedAt: lexnetNotifications.receivedAt,
-        read: lexnetNotifications.read,
-      })
-      .from(lexnetNotifications)
-      .where(and(eq(lexnetNotifications.caseId, row.id), eq(lexnetNotifications.userId, userId)))
-      .orderBy(desc(lexnetNotifications.receivedAt))
-      .limit(20),
-    db
-      .select({
-        id: documents.id,
-        name: documents.name,
-        fileUrl: documents.fileUrl,
-        fileSize: documents.fileSize,
-        mimeType: documents.mimeType,
-        uploadedAt: documents.uploadedAt,
-      })
-      .from(documents)
-      .where(eq(documents.caseId, row.id))
-      .orderBy(desc(documents.uploadedAt))
-      .limit(20),
-    db
-      .select({
-        totalMinutes: sql<number>`coalesce(sum(${timeEntries.minutes}), 0)`,
-        billableMinutes: sql<number>`coalesce(sum(case when ${timeEntries.billable} then ${timeEntries.minutes} else 0 end), 0)`,
-        entries: sql<number>`count(*)`,
-      })
-      .from(timeEntries)
-      .where(eq(timeEntries.caseId, row.id)),
-  ])
+  // Query each related entity individually so a failure tells us exactly which.
+  async function safe<T>(name: string, q: () => Promise<T>, fallback: T): Promise<T> {
+    try {
+      return await q()
+    } catch (err) {
+      console.error(`[case ${row!.id}] query "${name}" failed`, err)
+      return fallback
+    }
+  }
+
+  const caseDeadlines = await safe(
+    "deadlines",
+    () =>
+      db
+        .select({
+          id: deadlines.id,
+          title: deadlines.title,
+          dueDate: deadlines.dueDate,
+          status: deadlines.status,
+        })
+        .from(deadlines)
+        .where(and(eq(deadlines.caseId, row.id), eq(deadlines.userId, userId)))
+        .orderBy(asc(deadlines.dueDate)),
+    [] as { id: string; title: string; dueDate: Date; status: string }[]
+  )
+
+  const caseEvents = await safe(
+    "events",
+    () =>
+      db
+        .select({
+          id: eventsTable.id,
+          title: eventsTable.title,
+          type: eventsTable.type,
+          startAt: eventsTable.startAt,
+          endAt: eventsTable.endAt,
+          location: eventsTable.location,
+          completed: eventsTable.completed,
+        })
+        .from(eventsTable)
+        .where(and(eq(eventsTable.caseId, row.id), eq(eventsTable.userId, userId)))
+        .orderBy(asc(eventsTable.startAt)),
+    [] as {
+      id: string
+      title: string
+      type: string
+      startAt: Date
+      endAt: Date | null
+      location: string | null
+      completed: boolean
+    }[]
+  )
+
+  const caseLexnet = await safe(
+    "lexnet",
+    () =>
+      db
+        .select({
+          id: lexnetNotifications.id,
+          subject: lexnetNotifications.subject,
+          sender: lexnetNotifications.sender,
+          type: lexnetNotifications.type,
+          receivedAt: lexnetNotifications.receivedAt,
+          read: lexnetNotifications.read,
+        })
+        .from(lexnetNotifications)
+        .where(
+          and(
+            eq(lexnetNotifications.caseId, row.id),
+            eq(lexnetNotifications.userId, userId)
+          )
+        )
+        .orderBy(desc(lexnetNotifications.receivedAt))
+        .limit(20),
+    [] as {
+      id: string
+      subject: string
+      sender: string | null
+      type: string
+      receivedAt: Date
+      read: boolean
+    }[]
+  )
+
+  const caseDocs = await safe(
+    "documents",
+    () =>
+      db
+        .select({
+          id: documents.id,
+          name: documents.name,
+          fileUrl: documents.fileUrl,
+          fileSize: documents.fileSize,
+          mimeType: documents.mimeType,
+          uploadedAt: documents.uploadedAt,
+        })
+        .from(documents)
+        .where(eq(documents.caseId, row.id))
+        .orderBy(desc(documents.uploadedAt))
+        .limit(20),
+    [] as {
+      id: string
+      name: string
+      fileUrl: string
+      fileSize: number | null
+      mimeType: string | null
+      uploadedAt: Date
+    }[]
+  )
+
+  const timeAgg = await safe(
+    "time-aggregate",
+    () =>
+      db
+        .select({
+          totalMinutes: sql<number>`coalesce(sum(${timeEntries.minutes}), 0)`,
+          billableMinutes: sql<number>`coalesce(sum(case when ${timeEntries.billable} then ${timeEntries.minutes} else 0 end), 0)`,
+          entries: sql<number>`count(*)`,
+        })
+        .from(timeEntries)
+        .where(eq(timeEntries.caseId, row.id)),
+    [{ totalMinutes: 0, billableMinutes: 0, entries: 0 }]
+  )
 
   const now = new Date()
   function daysUntil(d: Date) {
