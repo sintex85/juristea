@@ -19,19 +19,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   providers: [
     Google({
+      // Basic scopes only — calendar.events is requested via the
+      // /api/google/connect-calendar incremental flow so the default
+      // sign-up works for every Google user without verification.
       allowDangerousEmailAccountLinking: true,
-      authorization: {
-        params: {
-          scope: [
-            "openid",
-            "email",
-            "profile",
-            "https://www.googleapis.com/auth/calendar.events",
-          ].join(" "),
-          access_type: "offline",
-          prompt: "consent",
-        },
-      },
     }),
     Nodemailer({
       server: {

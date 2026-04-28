@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { signIn } from "next-auth/react"
 import { Calendar, MessageCircle, Send, ArrowRight, Check, AlertTriangle } from "lucide-react"
 
 type IntegrationStatus = {
@@ -43,9 +42,7 @@ export function IntegrationsCard() {
           actionLabel={
             status?.googleCalendar.connected ? "Reconectar" : "Conectar"
           }
-          onAction={() =>
-            signIn("google", { callbackUrl: "/dashboard/settings" })
-          }
+          actionHref="/api/google/connect-calendar"
         />
 
         {/* WhatsApp */}
