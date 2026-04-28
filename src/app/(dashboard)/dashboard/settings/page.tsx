@@ -4,6 +4,7 @@ import { ArrowRight, Mail, Bell, Shield, AlertTriangle } from "lucide-react"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { users, notificationSettings } from "@/lib/db/schema"
+import { IntegrationsCard } from "./integrations"
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -114,6 +115,9 @@ export default async function SettingsPage() {
           />
         </ul>
       </section>
+
+      {/* INTEGRATIONS */}
+      <IntegrationsCard />
 
       {/* SECURITY */}
       <section className="mt-6 jur-card p-7">

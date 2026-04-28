@@ -18,7 +18,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   }),
   session: { strategy: "jwt" },
   providers: [
-    Google({ allowDangerousEmailAccountLinking: true }),
+    Google({
+      allowDangerousEmailAccountLinking: true,
+      authorization: {
+        params: {
+          scope: [
+            "openid",
+            "email",
+            "profile",
+            "https://www.googleapis.com/auth/calendar.events",
+          ].join(" "),
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
+    }),
     Nodemailer({
       server: {
         host: process.env.SMTP_HOST,
@@ -49,11 +63,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               provider: account.provider,
               providerAccountId: account.providerAccountId,
               access_token: account.access_token ?? null,
+              refresh_token: account.refresh_token ?? null,
+              expires_at: typeof account.expires_at === "number" ? account.expires_at : null,
               token_type: account.token_type ?? null,
               scope: account.scope ?? null,
               id_token: account.id_token ?? null,
             })
             user.id = existing.id
+          } else if (existingAccount && account.provider === "google") {
+            // Refresh stored tokens on subsequent sign-ins so calendar scope sticks
+            await db
+              .update(accounts)
+              .set({
+                access_token: account.access_token ?? existingAccount.access_token,
+                refresh_token: account.refresh_token ?? existingAccount.refresh_token,
+                expires_at:
+                  typeof account.expires_at === "number"
+                    ? account.expires_at
+                    : existingAccount.expires_at,
+                scope: account.scope ?? existingAccount.scope,
+                id_token: account.id_token ?? existingAccount.id_token,
+              })
+              .where(eq(accounts.userId, existing.id))
           }
         }
       }

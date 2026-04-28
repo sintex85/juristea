@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { events, cases } from "@/lib/db/schema"
 import { eq, and, gte, lte, asc } from "drizzle-orm"
 import { z } from "zod"
+import { syncEventToGoogle } from "@/lib/google-calendar"
 
 const createSchema = z.object({
   title: z.string().min(1).max(300),
@@ -72,6 +73,18 @@ export async function POST(req: Request) {
       userId: session.user.id,
     })
     .returning()
+
+  // Best-effort push to Google Calendar — never blocks the response.
+  syncEventToGoogle(session.user.id, {
+    id: created.id,
+    title: created.title,
+    description: created.description,
+    location: created.location,
+    startAt: created.startAt,
+    endAt: created.endAt,
+    allDay: created.allDay,
+    gcalEventId: created.gcalEventId,
+  }).catch((err) => console.error("[events:create] gcal sync failed", err))
 
   return Response.json(created, { status: 201 })
 }

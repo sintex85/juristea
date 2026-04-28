@@ -2,6 +2,10 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { events } from "@/lib/db/schema"
 import { eq, and } from "drizzle-orm"
+import {
+  syncEventToGoogle,
+  deleteEventFromGoogle,
+} from "@/lib/google-calendar"
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -19,6 +23,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     .returning()
 
   if (!updated) return Response.json({ error: "No encontrado" }, { status: 404 })
+
+  syncEventToGoogle(session.user.id, {
+    id: updated.id,
+    title: updated.title,
+    description: updated.description,
+    location: updated.location,
+    startAt: updated.startAt,
+    endAt: updated.endAt,
+    allDay: updated.allDay,
+    gcalEventId: updated.gcalEventId,
+  }).catch((err) => console.error("[events:update] gcal sync failed", err))
+
   return Response.json(updated)
 }
 
@@ -33,5 +49,10 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     .returning()
 
   if (!deleted) return Response.json({ error: "No encontrado" }, { status: 404 })
+
+  deleteEventFromGoogle(session.user.id, deleted.gcalEventId).catch((err) =>
+    console.error("[events:delete] gcal delete failed", err)
+  )
+
   return Response.json({ success: true })
 }

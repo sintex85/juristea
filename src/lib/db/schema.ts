@@ -287,6 +287,7 @@ export const events = pgTable("events", {
   remindMinutesBefore: integer("remind_minutes_before").default(60),
   whatsappReminder: boolean("whatsapp_reminder").default(false).notNull(),
   completed: boolean("completed").default(false).notNull(),
+  gcalEventId: text("gcal_event_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
