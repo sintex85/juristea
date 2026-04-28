@@ -24,6 +24,7 @@ export async function GET() {
       dueDate: deadlines.dueDate,
       status: deadlines.status,
       alertDays: deadlines.alertDays,
+      caseId: deadlines.caseId,
       caseTitle: cases.title,
       caseNumber: cases.caseNumber,
     })
