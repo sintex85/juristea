@@ -14,6 +14,7 @@ import {
   FileText,
   Settings,
   LifeBuoy,
+  Stethoscope,
   ChevronsUpDown,
   LogOut,
   type LucideIcon,
@@ -53,6 +54,7 @@ export const navItems: NavItem[] = [
 
 const settingsItems: NavItem[] = [
   { label: "Ajustes", href: "/dashboard/settings", icon: Settings },
+  { label: "Diagnóstico", href: "/dashboard/diagnostics", icon: Stethoscope },
   { label: "Ayuda", href: "/dashboard/help", icon: LifeBuoy },
 ]
 
