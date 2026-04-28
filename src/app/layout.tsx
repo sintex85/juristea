@@ -22,13 +22,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "48x48" },
-      { url: "/icon.png", type: "image/png", sizes: "512x512" },
-    ],
-    apple: "/apple-touch-icon.png",
-  },
+  // icons resolved automatically from src/app/icon.svg + apple-icon.svg
   title: {
     default: "Juristea — Gestiona tu despacho y controla tus plazos",
     template: "%s | Juristea",

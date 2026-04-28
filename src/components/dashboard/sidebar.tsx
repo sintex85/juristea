@@ -19,6 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { signOut } from "next-auth/react"
+import { Logo } from "@/components/logo"
 
 type NavItem = {
   label: string
@@ -68,7 +69,7 @@ export function Sidebar({
     <aside className="w-[240px] shrink-0 bg-[#F5F1EA] border-r border-[#E5E5E5] flex flex-col h-full">
       <div className="px-5 pt-5 pb-4">
         <div className="flex items-baseline gap-1.5">
-          <span className="jur-serif text-[26px] text-[#0A0A0A]">Juristea</span>
+          <Logo size="md" />
           <span className="jur-mono text-[10px] text-[#A0A0A0]">v26.1</span>
         </div>
         <button

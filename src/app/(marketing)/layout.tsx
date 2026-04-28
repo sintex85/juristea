@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { LandingEffects } from "@/components/landing/landing-effects"
 import { MobileNav } from "@/components/landing/mobile-nav"
+import { Logo } from "@/components/logo"
 
 function LinkedinIcon({ className }: { className?: string }) {
   return (
@@ -42,10 +43,8 @@ export default function MarketingLayout({
       >
         <div className="max-w-[1360px] mx-auto px-6 lg:px-10 relative">
           <div className="flex items-center justify-between h-[64px]">
-            <Link href="/" className="flex items-baseline gap-1.5">
-              <span className="serif text-[24px] tracking-tight text-ink">
-                Juristea
-              </span>
+            <Link href="/" className="flex items-baseline gap-1.5 text-ink">
+              <Logo size="md" />
               <span className="font-mono-j text-[10px] text-[#6B6B6B]">v26.1</span>
             </Link>
 
@@ -83,7 +82,7 @@ export default function MarketingLayout({
         <div className="max-w-[1360px] mx-auto px-6 lg:px-10 py-14">
           <div className="grid md:grid-cols-5 gap-10">
             <div className="md:col-span-1">
-              <div className="serif text-[26px] text-ink">Juristea</div>
+              <Logo size="lg" className="text-ink" />
               <p className="mt-3 text-[12.5px] text-[#6B6B6B]">
                 Software legal moderno para despachos en España.
               </p>

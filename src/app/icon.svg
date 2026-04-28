@@ -1,0 +1,13 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <text
+    x="34"
+    y="50"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', Times, serif"
+    font-size="60"
+    font-weight="400"
+    font-style="italic"
+    fill="#0A0A0A"
+  >J</text>
+  <circle cx="48" cy="48" r="3.5" fill="#B54534" />
+</svg>

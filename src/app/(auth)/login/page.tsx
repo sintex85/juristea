@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Logo } from "@/components/logo"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -28,10 +29,11 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">
-          {process.env.NEXT_PUBLIC_APP_NAME}
-        </CardTitle>
-        <CardDescription>Sign in to your account</CardDescription>
+        <div className="mx-auto mb-4">
+          <Logo size="lg" />
+        </div>
+        <CardTitle className="sr-only">Juristea</CardTitle>
+        <CardDescription>Entra a tu despacho</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
