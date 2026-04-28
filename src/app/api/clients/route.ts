@@ -5,12 +5,18 @@ import { eq, desc, sql } from "drizzle-orm"
 import { z } from "zod"
 
 const createSchema = z.object({
-  name: z.string().min(1).max(200),
-  email: z.string().email().optional().or(z.literal("")),
-  phone: z.string().optional(),
-  nif: z.string().optional(),
-  address: z.string().optional(),
-  notes: z.string().optional(),
+  name: z.string().trim().min(1, "Indica el nombre del cliente.").max(200),
+  email: z
+    .string()
+    .nullish()
+    .refine(
+      (v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+      "Ese email no parece válido."
+    ),
+  phone: z.string().nullish(),
+  nif: z.string().nullish(),
+  address: z.string().nullish(),
+  notes: z.string().nullish(),
 })
 
 export async function GET() {

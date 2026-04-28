@@ -54,6 +54,20 @@ function validate(data: CaseData): FieldErrors {
   return errors
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  title: "Título",
+  clientId: "Cliente",
+  caseNumber: "Nº de procedimiento",
+  nig: "NIG",
+  court: "Juzgado / Tribunal",
+  jurisdiction: "Jurisdicción",
+  description: "Descripción",
+  status: "Estado",
+}
+function labelFor(key: string): string {
+  return FIELD_LABELS[key] ?? key
+}
+
 export function CaseForm({
   mode,
   initial,
@@ -145,20 +159,41 @@ export function CaseForm({
       if (!res.ok) {
         const body = await res.json().catch(() => null)
         const fieldErrs = body?.error?.fieldErrors as Record<string, string[]> | undefined
+        const formErrs = body?.error?.formErrors as string[] | undefined
+        const summary: string[] = []
         if (fieldErrs) {
           const next: FieldErrors = {}
           for (const k of Object.keys(fieldErrs)) {
-            next[k as keyof CaseData] = fieldErrs[k]?.[0] ?? "Inválido"
+            const msg = fieldErrs[k]?.[0] ?? "Inválido"
+            next[k as keyof CaseData] = msg
+            summary.push(`${labelFor(k)}: ${msg}`)
           }
           setErrors(next)
+          // Mark every field with a server error as touched so the inline error
+          // shows even if the user never blurred that field.
+          setTouched((t) => {
+            const out = new Set(t)
+            for (const k of Object.keys(fieldErrs)) out.add(k as keyof CaseData)
+            return out
+          })
         }
         const message =
           (typeof body?.error === "string" && body.error) ||
+          (formErrs && formErrs.length > 0 ? formErrs.join(" · ") : null) ||
+          (summary.length > 0 ? summary.join(" · ") : null) ||
           (res.status === 403 && "Has llegado al límite de tu plan.") ||
           (res.status === 404 && "No encontrado.") ||
           (res.status === 401 && "Sesión caducada. Vuelve a iniciar sesión.") ||
           `Error ${res.status} al guardar.`
         setServerError(message)
+        // scroll to first error field if we got one
+        if (fieldErrs) {
+          const first = Object.keys(fieldErrs)[0]
+          if (first) {
+            const el = document.getElementById(first)
+            if (el) el.scrollIntoView({ block: "center", behavior: "smooth" })
+          }
+        }
         return
       }
 

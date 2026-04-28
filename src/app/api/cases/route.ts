@@ -6,13 +6,13 @@ import { z } from "zod"
 import { PLANS } from "@/lib/stripe/plans"
 
 const createSchema = z.object({
-  title: z.string().min(1).max(300),
-  clientId: z.string().min(1),
-  caseNumber: z.string().optional(),
-  nig: z.string().optional(),
-  court: z.string().optional(),
-  jurisdiction: z.string().optional(),
-  description: z.string().optional(),
+  title: z.string().trim().min(1, "Pon un título al expediente.").max(300),
+  clientId: z.string().min(1, "Elige el cliente del expediente."),
+  caseNumber: z.string().nullish(),
+  nig: z.string().nullish(),
+  court: z.string().nullish(),
+  jurisdiction: z.string().nullish(),
+  description: z.string().nullish(),
 })
 
 export async function GET() {
