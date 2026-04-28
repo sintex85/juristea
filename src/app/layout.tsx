@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Geist, Instrument_Serif, JetBrains_Mono } from "next/font/google"
+import { Geist, JetBrains_Mono } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import { Providers } from "@/components/providers"
 import "./globals.css"
@@ -7,13 +7,6 @@ import "./globals.css"
 const geist = Geist({
   variable: "--font-geist",
   subsets: ["latin"],
-})
-
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
 })
 
 const jetbrainsMono = JetBrains_Mono({
@@ -59,7 +52,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geist.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full`}
+      className={`${geist.variable} ${jetbrainsMono.variable} h-full`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col antialiased">

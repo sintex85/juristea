@@ -1,13 +1,12 @@
 <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="Juristea">
   <text
-    x="34"
+    x="20"
     y="50"
-    text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', Times, serif"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif"
     font-size="60"
-    font-weight="400"
-    font-style="italic"
+    font-weight="500"
     fill="currentColor"
+    letter-spacing="-0.04em"
   >J</text>
-  <circle cx="48" cy="48" r="3.5" fill="#B54534" />
+  <circle cx="44" cy="48" r="4" fill="#B54534" />
 </svg>

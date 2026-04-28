@@ -2,28 +2,31 @@ type Props = { className?: string; mark?: boolean; size?: "sm" | "md" | "lg" }
 
 const SIZES = {
   sm: { mark: 22, font: 18 },
-  md: { mark: 26, font: 24 },
-  lg: { mark: 36, font: 34 },
+  md: { mark: 26, font: 22 },
+  lg: { mark: 36, font: 32 },
 } as const
 
 /**
- * Juristea logo — italic serif "J" with terracotta dot.
- * Use `<Logo />` for the full wordmark, or `<Logo mark />` for the icon only.
- * `className` should set the text color (e.g. "text-[#0A0A0A]" or "text-white").
+ * Juristea logo — sans-serif "J" wordmark with terracotta dot.
+ * <Logo /> renders the full wordmark, <Logo mark /> renders just the icon.
+ * `className` controls color (e.g. "text-[#0A0A0A]" or "text-white").
  */
 export function Logo({ className = "text-[#0A0A0A]", mark = false, size = "md" }: Props) {
   const s = SIZES[size]
   return (
     <span
-      className={`inline-flex items-baseline gap-1.5 leading-none ${className}`}
-      style={{ fontFamily: "var(--font-instrument-serif), Georgia, serif" }}
+      className={`inline-flex items-baseline gap-1 leading-none ${className}`}
+      style={{ fontFamily: "var(--font-geist), system-ui, sans-serif" }}
       aria-label="Juristea"
     >
-      <LogoMark className={mark ? "" : ""} pixelSize={s.mark} />
+      <LogoMark pixelSize={s.mark} />
       {!mark && (
         <span
-          className="font-normal"
-          style={{ fontSize: s.font, letterSpacing: "-0.02em" }}
+          style={{
+            fontSize: s.font,
+            fontWeight: 500,
+            letterSpacing: "-0.04em",
+          }}
         >
           uristea
         </span>
@@ -49,18 +52,17 @@ export function LogoMark({
       aria-hidden="true"
     >
       <text
-        x="34"
+        x="20"
         y="50"
-        textAnchor="middle"
-        fontFamily="Georgia, 'Times New Roman', Times, serif"
+        fontFamily="var(--font-geist), system-ui, sans-serif"
         fontSize="60"
-        fontWeight="400"
-        fontStyle="italic"
+        fontWeight="500"
         fill="currentColor"
+        letterSpacing="-0.04em"
       >
         J
       </text>
-      <circle cx="48" cy="48" r="3.5" fill="#B54534" />
+      <circle cx="44" cy="48" r="4" fill="#B54534" />
     </svg>
   )
 }
